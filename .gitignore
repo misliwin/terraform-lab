@@ -4,3 +4,8 @@
 *.tfvars
 .ssh-key/
 ssh-key/
+.terraform/
+terraform.tfstate
+terraform.tfstate.backup
+terraform*
+.terraform*
