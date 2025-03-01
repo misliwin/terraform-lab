@@ -1,0 +1,10 @@
+# Ignorowanie plików Terraform
+.terraform/
+terraform.tfstate
+terraform.tfstate.backup
+terraform*
+.terraform*
+*.tfplan
+*.tfvars
+.ssh-key/
+ssh-key/
