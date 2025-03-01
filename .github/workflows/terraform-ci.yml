@@ -34,6 +34,12 @@ jobs:
       with:
         terraform_version: 1.4.5  # Wersja Terraform, którą chcesz używać
 
+    - name: Set up Terraform variables
+      run: |
+        echo "azure_storage_account_key=${{ secrets.azure_storage_account_key }}" >> $GITHUB_ENV
+      env:
+        azure_storage_account_key: ${{ secrets.azure_storage_account_key }}
+
     - name: Install Terraform dependencies
       run: terraform init  # Inicjalizuje Terraform, ściągając wymagane provider-y i moduły
 

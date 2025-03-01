@@ -30,6 +30,12 @@ jobs:
         with:
           terraform_version: 'latest'
 
+      - name: Set up Terraform variables
+        run: |
+          echo "azure_storage_account_key=${{ secrets.azure_storage_account_key }}" >> $GITHUB_ENV
+        env:
+          azure_storage_account_key: ${{ secrets.azure_storage_account_key }}
+
       - name: Initialize Terraform
         run: terraform init
 

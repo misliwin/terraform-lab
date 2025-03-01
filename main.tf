@@ -1,4 +1,18 @@
 
+terraform {
+  backend "azurerm" {
+    resource_group_name   = "Terraform-storage-account-RG"
+    storage_account_name  = "tfsamisliwin"
+    container_name        = "terraform-state-misliwin"
+    key                   = "terraform.tfstate" 
+    access_key            = "+SWuWVTE89w6d6W7Uk5R+xbdlwD5G6gIPvsT0y+N7Wj1XYmuqDaQ0H9qInyDfcFl5+OCLecVI+5V+AStvZcuQQ=="
+  }
+}
+
+#DefaultEndpointsProtocol=https;
+#AccountName=tfsamisliwin;
+#AccountKey=+SWuWVTE89w6d6W7Uk5R+xbdlwD5G6gIPvsT0y+N7Wj1XYmuqDaQ0H9qInyDfcFl5+OCLecVI+5V+AStvZcuQQ==;
+#EndpointSuffix=core.windows.net
 ##################################################################################
 # PROVIDERS
 ##################################################################################
