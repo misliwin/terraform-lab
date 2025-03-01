@@ -30,11 +30,9 @@ jobs:
         with:
           terraform_version: 'latest'
 
-      - name: Set up Terraform variables
+      - name: Configure Azure Storage Account for Terraform Backend
         run: |
-          echo "azure_storage_account_key=${{ secrets.azure_storage_account_key }}" >> $GITHUB_ENV
-        env:
-          azure_storage_account_key: ${{ secrets.azure_storage_account_key }}
+          echo "backend_configuration = \"access_key = ${AZURE_STORAGE_ACCESS_KEY}\"" > backend.tf
 
       - name: Initialize Terraform
         run: terraform init

@@ -5,7 +5,7 @@ terraform {
     storage_account_name  = "tfsamisliwin"
     container_name        = "terraform-state-misliwin"
     key                   = "terraform.tfstate" 
-    access_key            = var.azure_storage_account_key
+    #access_key            = var.azure_storage_account_key
   }
 }
 
