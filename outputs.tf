@@ -7,5 +7,5 @@ output "nginx_public_ip" {
 }
 
 output "public_ip_address" {
-  value = data.azurerm_public_ip.ftdv-mgmt-interface.ip_address
+  value = azurerm_public_ip.ftdv-mgmt-interface.ip_address
 }
