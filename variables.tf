@@ -3,10 +3,10 @@ variable "prefix" {
   default = "cisco-ftdv"
 }
 
-variable "azure_storage_account_key" {
-  type    = string
-  description = "Access key to storage acount"
-}
+#variable "azure_storage_account_key" {
+#  type    = string
+#  description = "Access key to storage acount"
+#}
 
 
 variable "company_tag" {
