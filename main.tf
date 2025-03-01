@@ -22,6 +22,7 @@ data "azurerm_public_ip" "ftdv-mgmt-interface" {
   resource_group_name = azurerm_virtual_machine.ftdv-instance.resource_group_name
 }
 
+
 ##################################################################################
 # RESOURCES
 ##################################################################################
