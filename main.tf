@@ -5,6 +5,8 @@ terraform {
     storage_account_name  = "tfsamisliwin"
     container_name        = "terraform-state-misliwin"
     key                   = "terraform.tfstate" 
+    subscription_id       = "df5fd655-d63c-4ed8-8542-2ec6c39845f2"
+    tenant_id             = "5ae1af62-9505-4097-a69a-c1553ef7840e"
     #access_key            = var.azure_storage_account_key
   }
 }
