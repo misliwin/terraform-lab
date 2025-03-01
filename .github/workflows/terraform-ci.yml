@@ -1,0 +1,43 @@
+name: Terraform Azure CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    # Krok 1: Instalacja Azure CLI
+    - name: Install Azure CLI
+      run: |
+        curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+
+    # Krok 2: Logowanie do Azure CLI z użyciem device code (interaktywne)
+    - name: Log in to Azure CLI
+      run: |
+        az login --use-device-code
+
+    - name: Checkout repository
+      uses: actions/checkout@v3  # Klonuje repozytorium
+
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v2  # Ustawia Terraform na maszynie wirtualnej
+      with:
+        terraform_version: 1.4.5  # Wersja Terraform, którą chcesz używać
+
+    - name: Install Terraform dependencies
+      run: terraform init  # Inicjalizuje Terraform, ściągając wymagane provider-y i moduły
+
+    - name: Terraform Plan
+      run: terraform plan  # Wykonuje planowanie zmian w infrastrukturze
+
+    - name: Terraform Apply
+      run: terraform apply -auto-approve  # Aplikowanie zmian na infrastrukturze, -auto-approve bez potwierdzenia
+
+    # Dodatkowe kroki, takie jak wysyłanie powiadomień, możesz dodać tutaj
