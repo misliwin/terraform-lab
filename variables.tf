@@ -1,7 +1,59 @@
+##################################################################################
+# Global
+##################################################################################
+
+
+variable "storage_account_resource_group_name" {
+  type    = string
+  description = "resource group for storage account"
+  default = "Terraform-storage-account-RG"
+}
+
+variable "tfstate_storage_account_name" {
+  type    = string
+  description = "Storage account name"
+  default = "tfsamisliwin"
+}
+
+variable "tfstate_container_name" {
+  type    = string
+  description = "container in storage account for tfstate"
+  default = "terraform-state-misliwin"
+}
+
+variable "tfstate_key" {
+  type    = string
+  default = "terraform.tfstate"
+  description = "Name of tfstate file"
+}
+
+variable "subscription_id" {
+  type    = string
+  default = "df5fd655-d63c-4ed8-8542-2ec6c39845f2"
+}
+
+variable "tenant_id" {
+  type    = string
+  default = "5ae1af62-9505-4097-a69a-c1553ef7840e"
+}
+
+
+##################################################################################
+# Cisco VM FTD
+##################################################################################
+
+variable "ftd_startup_file" {
+  type    = string
+  description = "file name of startup config for FTD"
+  default = "ftd_startup_file.txt"
+}
+
 variable "prefix" {
   type    = string
   default = "cisco-ftdv"
 }
+
+
 
 #variable "azure_storage_account_key" {
 #  type    = string

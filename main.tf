@@ -1,12 +1,12 @@
 
 terraform {
   backend "azurerm" {
-    resource_group_name   = "Terraform-storage-account-RG"
-    storage_account_name  = "tfsamisliwin"
-    container_name        = "terraform-state-misliwin"
-    key                   = "terraform.tfstate" 
-    subscription_id       = "df5fd655-d63c-4ed8-8542-2ec6c39845f2"
-    tenant_id             = "5ae1af62-9505-4097-a69a-c1553ef7840e"
+    resource_group_name   = var.storage_account_resource_group_name
+    storage_account_name  = var.tfstate_storage_account_name
+    container_name        = var.tfstate_container_name
+    key                   = var.tfstate_key
+    subscription_id       = var.subscription_id
+    tenant_id             = var.tenant_id
     #access_key            = var.azure_storage_account_key
   }
 }
@@ -18,7 +18,7 @@ terraform {
 
 provider "azurerm" {
   features {}
-  subscription_id = "df5fd655-d63c-4ed8-8542-2ec6c39845f2"
+  subscription_id = var.subscription_id
 }
 
 
@@ -27,13 +27,13 @@ provider "azurerm" {
 ##################################################################################
 
 data "template_file" "startup_file" {
-  template = file("ftd_startup_file.txt")
+  template = file(var.ftd_startup_file)
 }
 
-data "azurerm_public_ip" "ftdv-mgmt-interface" {
-  name                = azurerm_public_ip.ftdv-mgmt-interface.name
-  resource_group_name = azurerm_virtual_machine.ftdv-instance.resource_group_name
-}
+#data "azurerm_public_ip" "ftdv-mgmt-interface" {
+#  name                = azurerm_public_ip.ftdv-mgmt-interface.name
+#  resource_group_name = azurerm_virtual_machine.ftdv-instance.resource_group_name
+#}
 
 
 ##################################################################################
@@ -47,12 +47,17 @@ resource "azurerm_resource_group" "app_rg" {
   location = var.location
 }
 
+# vnet #
+
 resource "azurerm_virtual_network" "app_vnet" {
   name                = "app-vnet-${local.name_tag}"
   location            = var.location
   resource_group_name = azurerm_resource_group.app_rg.name
   address_space       = var.vnet_address_space
 }
+
+# subnets both server and FTD #
+
 
 resource "azurerm_subnet" "dmz_subnet1" {
   name                 = "dmz-subnet-1-${local.name_tag}"
@@ -90,7 +95,7 @@ resource "azurerm_subnet" "ftdv-inside" {
   address_prefixes     = ["10.0.4.0/24"]
 }
 
-# INTERNET ACCESS #
+# INTERNET ACCESS for VM web server#
 
 resource "azurerm_public_ip" "nginx_public_ip" {
   name                = "nginx-public-ip-${local.name_tag}"
@@ -165,49 +170,6 @@ resource "azurerm_subnet_route_table_association" "public_subnet_association" {
 }
 
 
-# FTD routing:
-
-
-resource "azurerm_route_table" "FTD_NIC0" {
-  name                = "${var.prefix}-RT-Subnet0-${local.name_tag}"
-  location            = var.location
-  resource_group_name = azurerm_resource_group.app_rg.name
-
-}
-resource "azurerm_route_table" "FTD_NIC1" {
-  name                = "${var.prefix}-RT-Subnet1-${local.name_tag}"
-  location            = var.location
-  resource_group_name = azurerm_resource_group.app_rg.name
-
-}
-resource "azurerm_route_table" "FTD_NIC2" {
-  name                = "${var.prefix}-RT-Subnet2-${local.name_tag}"
-  location            = var.location
-  resource_group_name = azurerm_resource_group.app_rg.name
-}
-
-resource "azurerm_route_table" "FTD_NIC3" {
-  name                = "${var.prefix}-RT-Subnet3-${local.name_tag}"
-  location            = var.location
-  resource_group_name = azurerm_resource_group.app_rg.name
-}
-
-resource "azurerm_subnet_route_table_association" "example1" {
-  subnet_id                 = azurerm_subnet.ftdv-management.id
-  route_table_id            = azurerm_route_table.FTD_NIC0.id
-}
-resource "azurerm_subnet_route_table_association" "example2" {
-  subnet_id                 = azurerm_subnet.ftdv-diagnostic.id
-  route_table_id            = azurerm_route_table.FTD_NIC1.id
-}
-resource "azurerm_subnet_route_table_association" "example3" {
-  subnet_id                 = azurerm_subnet.ftdv-outside.id
-  route_table_id            = azurerm_route_table.FTD_NIC2.id
-}
-resource "azurerm_subnet_route_table_association" "example4" {
-  subnet_id                 = azurerm_subnet.ftdv-inside.id
-  route_table_id            = azurerm_route_table.FTD_NIC3.id
-}
 
 
 
@@ -279,8 +241,55 @@ resource "azurerm_linux_virtual_machine" "nginx_vm" {
 
 
 
-################ FTD
 
+################################################################################################################################
+# FTD config
+################################################################################################################################
+
+
+# FTD routing:
+
+
+resource "azurerm_route_table" "FTD_NIC0" {
+  name                = "${var.prefix}-RT-Subnet0-${local.name_tag}"
+  location            = var.location
+  resource_group_name = azurerm_resource_group.app_rg.name
+
+}
+resource "azurerm_route_table" "FTD_NIC1" {
+  name                = "${var.prefix}-RT-Subnet1-${local.name_tag}"
+  location            = var.location
+  resource_group_name = azurerm_resource_group.app_rg.name
+
+}
+resource "azurerm_route_table" "FTD_NIC2" {
+  name                = "${var.prefix}-RT-Subnet2-${local.name_tag}"
+  location            = var.location
+  resource_group_name = azurerm_resource_group.app_rg.name
+}
+
+resource "azurerm_route_table" "FTD_NIC3" {
+  name                = "${var.prefix}-RT-Subnet3-${local.name_tag}"
+  location            = var.location
+  resource_group_name = azurerm_resource_group.app_rg.name
+}
+
+resource "azurerm_subnet_route_table_association" "example1" {
+  subnet_id                 = azurerm_subnet.ftdv-management.id
+  route_table_id            = azurerm_route_table.FTD_NIC0.id
+}
+resource "azurerm_subnet_route_table_association" "example2" {
+  subnet_id                 = azurerm_subnet.ftdv-diagnostic.id
+  route_table_id            = azurerm_route_table.FTD_NIC1.id
+}
+resource "azurerm_subnet_route_table_association" "example3" {
+  subnet_id                 = azurerm_subnet.ftdv-outside.id
+  route_table_id            = azurerm_route_table.FTD_NIC2.id
+}
+resource "azurerm_subnet_route_table_association" "example4" {
+  subnet_id                 = azurerm_subnet.ftdv-inside.id
+  route_table_id            = azurerm_route_table.FTD_NIC3.id
+}
 
 ################################################################################################################################
 # Network Interface Creation, Public IP Creation and Network Security Group Association
