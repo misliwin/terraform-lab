@@ -35,3 +35,12 @@ jobs:
 
       - name: Run Terraform Destroy
         run: terraform destroy -auto-approve
+        continue-on-error: true  # Pozwól kontynuować, nawet jeśli błąd wystąpi
+
+      - name: Retry if Terraform Destroy failed
+        if: failure()  # Wykonaj tylko w przypadku błędu
+        run: terraform destroy -auto-approve
+
+      - name: Retry if Terraform Destroy failed 2
+        if: failure()  # Wykonaj tylko w przypadku błędu
+        run: terraform destroy -auto-approve
