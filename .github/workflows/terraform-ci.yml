@@ -1,9 +1,12 @@
 name: Terraform Azure CI/CD Pipeline
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:  # Manualny wyzwalacz uruchamiany z UI GitHub
+    inputs:
+      confirmation:
+        description: 'Type "apply" to confirm destruction of infrastructure'
+        required: true
+        default: 'apply'  # Możesz ustawić domyślną wartość jako "destroy", aby użytkownik musiał ją zatwierdzić
 
 jobs:
   terraform:
