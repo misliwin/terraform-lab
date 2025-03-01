@@ -30,12 +30,11 @@ jobs:
         with:
           terraform_version: 'latest'
 
-      - name: Configure Azure Storage Account for Terraform Backend
-        run: |
-          echo "backend_configuration = \"access_key = ${AZURE_STORAGE_ACCESS_KEY}\"" > backend.tf
-
       - name: Initialize Terraform
-        run: terraform init
+        run: terraform init \
+          -backend-config="access_key=${{ secrets.AZURE_STORAGE_ACCESS_KEY }}"  # Użycie GitHub Secrets
+        env:
+          AZURE_STORAGE_ACCESS_KEY: ${{ secrets.AZURE_STORAGE_ACCESS_KEY }}  # Przekazanie secretu do środowiska
 
       - name: Run Terraform Destroy
         run: terraform destroy -auto-approve

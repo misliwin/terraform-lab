@@ -34,12 +34,11 @@ jobs:
       with:
         terraform_version: 1.4.5  # Wersja Terraform, którą chcesz używać
 
-    - name: Configure Azure Storage Account for Terraform Backend
-      run: |
-        echo "backend_configuration = \"access_key = ${AZURE_STORAGE_ACCESS_KEY}\"" > backend.tf
-
     - name: Install Terraform dependencies
-      run: terraform init  # Inicjalizuje Terraform, ściągając wymagane provider-y i moduły
+      run: terraform init \
+          -backend-config="access_key=${{ secrets.AZURE_STORAGE_ACCESS_KEY }}"  # Użycie GitHub Secrets
+      env:
+        AZURE_STORAGE_ACCESS_KEY: ${{ secrets.AZURE_STORAGE_ACCESS_KEY }}  # Przekazanie secretu do środowiska
 
     - name: Terraform Plan
       run: terraform plan  # Wykonuje planowanie zmian w infrastrukturze
