@@ -96,7 +96,7 @@ resource "azurerm_subnet" "ftdv-inside" {
   address_prefixes     = ["10.0.4.0/24"]
 }
 
-# INTERNET ACCESS for VM web server#
+######### Public IP for Web VM
 
 resource "azurerm_public_ip" "nginx_public_ip" {
   name                = "nginx-public-ip-${local.name_tag}"
@@ -105,6 +105,9 @@ resource "azurerm_public_ip" "nginx_public_ip" {
   allocation_method   = "Dynamic"
   sku                 = "Basic" 
 }
+
+# INTERNET ACCESS for VM web server# - NSG
+
 
 resource "azurerm_network_security_group" "allow_web" {
   name                = "nginx-nsg-${local.name_tag}"
@@ -500,13 +503,13 @@ resource "azurerm_virtual_machine" "Cisco_ISE" {
 
   plan {
     name      = "cisco-ise_3_4"        # Wskaż nazwę obrazu Cisco ISE, jeśli jest dostępny w Azure Marketplace
-    publisher = "Cisco"                  # Wydawca obrazu
+    publisher = "cisco"                  # Wydawca obrazu
     product   = "cisco-ise-virtual"              # Produkt Cisco ISE
   }
 
   storage_image_reference {
     # Obraz Cisco ISE w wersji 3.4
-    publisher = "Cisco"
+    publisher = "cisco"
     offer     = "cisco-ise-virtual"
     sku       = "cisco-ise_3_4"  # Wersja obrazu
     version   = "3.4.608"  # Konkretna wersja obrazu
