@@ -454,3 +454,80 @@ resource "azurerm_virtual_machine" "ftdv-instance" {
 # Cisco ISE Instance Creation
 ################################################################################################################################
 
+resource "azurerm_network_interface" "ise-interface-management" {
+  name                      = "cisco-ise-Nic0"
+  location                  = var.location
+  resource_group_name       = azurerm_resource_group.app_rg.name
+
+  ip_configuration {
+    name                          = "ise-Nic0"
+    subnet_id                     = azurerm_subnet.ftdv-management.id
+    private_ip_address_allocation = "Dynamic"
+    public_ip_address_id          = azurerm_public_ip.ise-mgmt-interface.id
+  }
+}
+
+resource "azurerm_public_ip" "ise-mgmt-interface" {
+  name                         = "ise-management-public-ip"
+  location                     = var.location
+  resource_group_name          = azurerm_resource_group.app_rg.name
+  allocation_method   = "Dynamic"
+  sku                 = "Basic" 
+}
+
+resource "azurerm_network_interface_security_group_association" "ISE_NIC0_NSG" {
+  network_interface_id      = azurerm_network_interface.ise-interface-management.id
+  network_security_group_id = azurerm_network_security_group.allow_web.id
+}
+
+
+resource "azurerm_virtual_machine" "Cisco_ISE" {
+  name                  = "${var.prefix}-vm-Cisco-ISE"
+  location              = var.location
+  resource_group_name   = azurerm_resource_group.app_rg.name
+  
+  depends_on = [
+    azurerm_network_interface.ise-interface-management,
+  ]
+  
+  primary_network_interface_id = azurerm_network_interface.ise-interface-management.id
+  network_interface_ids = [azurerm_network_interface.ise-interface-management.id]
+  vm_size               = "Standard_D8s_v4"
+
+
+  delete_os_disk_on_termination = true
+  delete_data_disks_on_termination = true
+
+  plan {
+    name      = "cisco-ise_3_4"        # Wskaż nazwę obrazu Cisco ISE, jeśli jest dostępny w Azure Marketplace
+    publisher = "Cisco"                  # Wydawca obrazu
+    product   = "cisco-ise-virtual"              # Produkt Cisco ISE
+  }
+
+  storage_image_reference {
+    # Obraz Cisco ISE w wersji 3.4
+    publisher = "Cisco"
+    offer     = "cisco-ise-virtual"
+    sku       = "cisco-ise_3_4"  # Wersja obrazu
+    version   = "3.4.608"  # Konkretna wersja obrazu
+  }
+
+  storage_os_disk {
+    name              = "ise-os-disk"
+    caching           = "ReadWrite"
+    create_option     = "FromImage"
+    managed_disk_type = "Standard_LRS"
+  }
+
+  os_profile {
+    admin_username = var.username
+    admin_password = var.password
+    computer_name  = "ise-vmka"
+    #custom_data = data.template_file.startup_file.rendered
+  }
+  os_profile_linux_config {
+    disable_password_authentication = false
+
+  }
+
+}
