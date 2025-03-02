@@ -22,6 +22,7 @@ provider "azurerm" {
 }
 
 
+
 ##################################################################################
 # DATA
 ##################################################################################
@@ -256,6 +257,15 @@ resource "azurerm_route_table" "FTD_NIC0" {
   resource_group_name = azurerm_resource_group.app_rg.name
 
 }
+
+resource "azurerm_route" "internet_route_NIC0" {
+  name                   = "default-route-${local.name_tag}"
+  resource_group_name    = azurerm_resource_group.app_rg.name
+  route_table_name       = azurerm_route_table.FTD_NIC0.name
+  address_prefix         = "0.0.0.0/0"
+  next_hop_type          = "Internet"
+}
+
 resource "azurerm_route_table" "FTD_NIC1" {
   name                = "${var.prefix}-RT-Subnet1-${local.name_tag}"
   location            = var.location
@@ -266,6 +276,14 @@ resource "azurerm_route_table" "FTD_NIC2" {
   name                = "${var.prefix}-RT-Subnet2-${local.name_tag}"
   location            = var.location
   resource_group_name = azurerm_resource_group.app_rg.name
+}
+
+resource "azurerm_route" "internet_route_NIC2" {
+  name                   = "default-route-${local.name_tag}"
+  resource_group_name    = azurerm_resource_group.app_rg.name
+  route_table_name       = azurerm_route_table.FTD_NIC2.name
+  address_prefix         = "0.0.0.0/0"
+  next_hop_type          = "Internet"
 }
 
 resource "azurerm_route_table" "FTD_NIC3" {
@@ -376,6 +394,83 @@ resource "azurerm_network_interface_security_group_association" "FTDv_NIC3_NSG" 
 ################################################################################################################################
 # FTDv Instance Creation
 ################################################################################################################################
+
+resource "azurerm_virtual_machine" "ftdv-instance" {
+  name                  = "${var.prefix}-vm"
+  location              = var.location
+  resource_group_name   = azurerm_resource_group.app_rg.name
+  
+  depends_on = [
+    azurerm_network_interface.ftdv-interface-management,
+    azurerm_network_interface.ftdv-interface-diagnostic,
+    azurerm_network_interface.ftdv-interface-outside,
+    azurerm_network_interface.ftdv-interface-inside
+  ]
+  
+  primary_network_interface_id = azurerm_network_interface.ftdv-interface-management.id
+  network_interface_ids = [azurerm_network_interface.ftdv-interface-management.id,
+                                                        azurerm_network_interface.ftdv-interface-diagnostic.id,
+                                                        azurerm_network_interface.ftdv-interface-outside.id,
+                                                        azurerm_network_interface.ftdv-interface-inside.id]
+  vm_size               = var.VMSize
+
+
+  delete_os_disk_on_termination = true
+  delete_data_disks_on_termination = true
+
+  plan {
+    name = "ftdv-azure-byol"
+    publisher = "cisco"
+    product = "cisco-ftdv"
+  }
+
+  storage_image_reference {
+    publisher = "cisco"
+    offer     = "cisco-ftdv"
+    sku       = "ftdv-azure-byol"
+    version   = var.Version
+  }
+  storage_os_disk {
+    name              = "myosdisk"
+    caching           = "ReadWrite"
+    create_option     = "FromImage"
+    managed_disk_type = "Standard_LRS"
+  }
+  os_profile {
+    admin_username = var.username
+    admin_password = var.password
+    computer_name  = var.instancename
+    custom_data = data.template_file.startup_file.rendered
+
+  }
+  os_profile_linux_config {
+    disable_password_authentication = false
+
+  }
+
+}
+
+################################################################################################################################
+# Cisco ISE Instance Creation
+################################################################################################################################
+
+
+resource "azurerm_network_interface_security_group_association" "FTDv_NIC0_NSG" {
+  network_interface_id      = azurerm_network_interface.ftdv-interface-management.id
+  network_security_group_id = azurerm_network_security_group.allow_web.id
+}
+resource "azurerm_network_interface_security_group_association" "FTDv_NIC1_NSG" {
+  network_interface_id      = azurerm_network_interface.ftdv-interface-diagnostic.id
+  network_security_group_id = azurerm_network_security_group.allow_web.id
+}
+resource "azurerm_network_interface_security_group_association" "FTDv_NIC2_NSG" {
+  network_interface_id      = azurerm_network_interface.ftdv-interface-outside.id
+  network_security_group_id = azurerm_network_security_group.allow_web.id
+}
+resource "azurerm_network_interface_security_group_association" "FTDv_NIC3_NSG" {
+  network_interface_id      = azurerm_network_interface.ftdv-interface-inside.id
+  network_security_group_id = azurerm_network_security_group.allow_web.id
+}
 
 resource "azurerm_virtual_machine" "ftdv-instance" {
   name                  = "${var.prefix}-vm"
