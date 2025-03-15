@@ -4,6 +4,23 @@
 
 
 
+variable "company" {
+  type        = string
+  description = "Company name for resource tagging"
+  default     = "misliwin-company"
+}
+
+variable "project" {
+  type        = string
+  description = "Project name for resource tagging"
+  default = "terraform-project"
+}
+
+variable "billing_code" {
+  type        = string
+  description = "Billing code for resource tagging"
+  default = "default-billing-code"
+}
 
 variable "company_tag" {
   type = string
@@ -15,6 +32,34 @@ variable "location" {
   type        = string
   description = "base location"
   default     = "Poland Central"
+}
+
+variable "environment" {
+  type = string
+  description = "which env is it"
+  default = "ACC"
+}
+
+##################################################################################
+# Counts
+##################################################################################
+
+variable "vnet_subnet_count" {
+  type        = number
+  description = "Number of subnets"
+  default     = 3
+}
+
+variable "ftd_int_count" {
+  type        = number
+  description = "Number of subnets"
+  default     = 4
+}
+
+variable "instances_count" {
+  type        = number
+  description = "Number of servers"
+  default     = 4
 }
 
 ##################################################################################
@@ -31,32 +76,39 @@ variable "vnet_address_space" {
 variable "subnet_address_space" {
   type        = list(string)
   description = "Base Address Space for VNET"
-  default     = ["10.0.0.0/24"]
+  default     = ["10.0.0.0/24", "10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24", "10.0.4.0/24", "10.0.5.0/24"]
 }
 
-variable "mgmt_address_space" {
+variable "ftd_address_space" {
   type        = list(string)
   description = "Base Address Space for VNET"
-  default     = ["10.0.1.0/24"]
+  default     = ["10.0.251.0/24", "10.0.252.0/24", "10.0.253.0/24", "10.0.254.0/24", "10.0.255.0/24", "10.0.250.0/24"]
 }
 
-variable "diagnostic_address_space" {
-  type        = list(string)
-  description = "Base Address Space for VNET"
-  default     = ["10.0.2.0/24"]
-}
 
-variable "outside_address_space" {
-  type        = list(string)
-  description = "Base Address Space for VNET"
-  default     = ["10.0.3.0/24"]
-}
-
-variable "inside_address_space" {
-  type        = list(string)
-  description = "Base Address Space for VNET"
-  default     = ["10.0.4.0/24"]
-}
+#variable "mgmt_address_space" {
+#  type        = list(string)
+#  description = "Base Address Space for VNET"
+#  default     = ["10.0.1.0/24"]
+#}
+#
+#variable "diagnostic_address_space" {
+#  type        = list(string)
+#  description = "Base Address Space for VNET"
+#  default     = ["10.0.2.0/24"]
+#}
+#
+#variable "outside_address_space" {
+#  type        = list(string)
+#  description = "Base Address Space for VNET"
+#  default     = ["10.0.3.0/24"]
+#}
+#
+#variable "inside_address_space" {
+#  type        = list(string)
+#  description = "Base Address Space for VNET"
+#  default     = ["10.0.4.0/24"]
+#}
 
 
 ##################################################################################

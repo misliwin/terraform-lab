@@ -5,6 +5,33 @@
 
 # FTD routing:
 
+resource "azurerm_subnet" "ftdv-management" {
+  name                 = "management-${local.name_tag}"
+  resource_group_name  = azurerm_resource_group.app_rg.name
+  virtual_network_name = azurerm_virtual_network.app_vnet.name
+  address_prefixes     = [var.ftd_address_space[1]]
+}
+
+resource "azurerm_subnet" "ftdv-diagnostic" {
+  name                 = "diagnostic-${local.name_tag}"
+  resource_group_name  = azurerm_resource_group.app_rg.name
+  virtual_network_name = azurerm_virtual_network.app_vnet.name
+  address_prefixes     = [var.ftd_address_space[2]]
+}
+
+resource "azurerm_subnet" "ftdv-outside" {
+  name                 = "outside-${local.name_tag}"
+  resource_group_name  = azurerm_resource_group.app_rg.name
+  virtual_network_name = azurerm_virtual_network.app_vnet.name
+  address_prefixes     = [var.ftd_address_space[3]]
+}
+
+resource "azurerm_subnet" "ftdv-inside" {
+  name                 = "inside-${local.name_tag}"
+  resource_group_name  = azurerm_resource_group.app_rg.name
+  virtual_network_name = azurerm_virtual_network.app_vnet.name
+  address_prefixes     = [var.ftd_address_space[4]]
+}
 
 resource "azurerm_route_table" "FTD_NIC0" {
   name                = "${var.prefix}-RT-Subnet0-${local.name_tag}"
@@ -193,8 +220,8 @@ resource "azurerm_virtual_machine" "ftdv-instance" {
   }
   os_profile {
     admin_username = var.ftd1_config.os_profile.admin_username
-    admin_password = var.ftd1_config.os_profile.password
-    computer_name  = var.ftd1_config.os_profile.instancename
+    admin_password = var.ftd1_config.os_profile.admin_password
+    computer_name  = var.ftd1_config.os_profile.computer_name
     custom_data = data.template_file.startup_file.rendered
 
   }
