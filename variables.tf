@@ -78,6 +78,7 @@ variable "subnet_address_space" {
   description = "Base Address Space for VNET"
   default     = ["10.0.0.0/24", "10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24", "10.0.4.0/24", "10.0.5.0/24"]
 }
+#[for subnet in range(var.vnet_subnet_count): cidrsubnet(var.vnet_address_space[0], 8, subnet)]
 
 variable "ftd_address_space" {
   type        = list(string)
