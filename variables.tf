@@ -117,6 +117,7 @@ variable "ftd_address_space" {
 ##################################################################################
 
 
+
 variable "VM_size" {
   type        = string
   description = "standard VM size"
